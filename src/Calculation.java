@@ -1,12 +1,12 @@
 public class Calculation {
 	//싱글톤 패턴
-	private static final SingletonService instance = new SingletonService();
+	private static final Calculation instance = new Calculation();
 	//getter
-	public static SingletonService getInstance() {
+	public static Calculation getInstance() {
 		return instance;
 	}
 	//객체 생성 방어
-	private SingletonService() {}
+	private Calculation() {}
 
 	//기본 요금
 	public int baseFee(int kWh) {
@@ -27,26 +27,26 @@ public class Calculation {
 	double secondStageFee = 0;
 	double thirdStageFee = 0;
 
-	//전력량 요금
-	public double totalElectricityFee(int kWh) {
+	//전력량 요금(1원 미만 절사)
+	public int electricityFee(int kWh) {
 
 		//200이하 사용시 1kWh당 120원
 		if(kWh<=200) {
 			firstStageFee = (double)120*kWh;
-			return firstStageFee;
+			return (int)firstStageFee;
 		}
 		//201~400 사용시 1kWh당 214.6원
 		else if(kWh>=201 && kWh<=400) {
 			firstStageFee = (double)120*200;
 			secondStageFee = (double)214.6*(kWh-200);
-			return firstStageFee + secondStageFee;
+			return (int)(firstStageFee + secondStageFee);
 		}
 		//400이상 사용시 1kWh당 307.3원
 		else {
 			firstStageFee = (double)120*200;
 			secondStageFee = (double)213.6*200;
 			thirdStageFee = (double)307.3*(kWh-400);
-			return firstStageFee + secondStageFee + thirdStageFee;
+			return (int)(firstStageFee + secondStageFee + thirdStageFee);
 		}
 	}
 
@@ -61,14 +61,14 @@ public class Calculation {
 	public int totalElectricityFee(int kWh) {
 
 		return (int)(instance.baseFee(kWh)+
-				instance.totalElectricityFee(kWh)+
+				instance.electricityFee(kWh)+
 				instance.climateEnvironmentFee(kWh));
 	}
 
 	//전력기반기금
 	public int electricityInfrastructureFund(int kWh) {
 
-		//전기요금 * 3.7% (10원미만절사)		
+		//전기요금 * 3.7% (10원미만절사)
 		return (int)(instance.totalElectricityFee(kWh)*(37/1000)/10)*10;
 	}
 
@@ -77,16 +77,17 @@ public class Calculation {
 	public int valueAddedTax(int kWh) {
 
 		// 전기요금 * 10% (1원미만 반올림)
-		return (int)Math.round(instance.totalElectricityFee(kWh)*1/10);
+		return (int)Math.round(instance.totalElectricityFee(kWh)/10);
 	}
 
 	//청구 금액
 	public int totalCharge(int kWh) {
 		
-		//전기 요금(기본 요금 + 전력량 요금 + 기후환경 요금) + 전력기반기금 + 부가 가치세
-		return instance.totalElectricityFee(kWh)+
+		//전기 요금(기본 요금 + 전력량 요금 + 기후환경 요금) + 전력기반기금 + 부가 가치세 (10원 미만 절사)
+		return (int)(instance.totalElectricityFee(kWh)+
 				instance.electricityInfrastructureFund(kWh)+
-				instance.valueAddedTax(kWh);
+				instance.valueAddedTax(kWh)
+				/10)*10;
 	}
 
 }
