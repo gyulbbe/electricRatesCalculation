@@ -69,7 +69,7 @@ public class Calculation {
 	public int electricityInfrastructureFund(int kWh) {
 
 		//전기요금 * 3.7% (10원미만절사)
-		return (int)(instance.totalElectricityFee(kWh)*(37/1000)/10)*10;
+		return (int)(instance.totalElectricityFee(kWh)*37/1000/10)*10;
 	}
 
 
