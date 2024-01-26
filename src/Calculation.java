@@ -89,5 +89,4 @@ public class Calculation {
 				instance.valueAddedTax(kWh)
 				/10)*10;
 	}
-
 }
